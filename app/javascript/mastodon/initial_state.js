@@ -4,6 +4,7 @@ const initialState = element && JSON.parse(element.textContent);
 const getMeta = (prop) => initialState && initialState.meta && initialState.meta[prop];
 
 export const reduceMotion = getMeta('reduce_motion');
+export const domain = getMeta('domain');
 export const timelineInjectionRate = getMeta('timeline_injection_rate');
 export const adInjectionRate = getMeta('ad_injection_rate');
 export const googleAdClient = getMeta('google_ad_client');

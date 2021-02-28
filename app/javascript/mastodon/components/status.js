@@ -17,11 +17,13 @@ import { HotKeys } from 'react-hotkeys';
 import classNames from 'classnames';
 import Icon from 'mastodon/components/icon';
 import { displayMedia } from '../initial_state';
+import AnimatedNumber from 'mastodon/components/animated_number';
 import PictureInPicturePlaceholder from 'mastodon/components/picture_in_picture_placeholder';
 
 // We use the component (and not the container) since we do not want
 // to use the progress bar to show download progress
 import Bundle from '../features/ui/components/bundle';
+import { Link } from 'react-router-dom';
 
 export const textForScreenReader = (intl, status, rebloggedByText = false) => {
   const displayName = status.getIn(['account', 'display_name']);
@@ -442,6 +444,63 @@ class Status extends ImmutablePureComponent {
       );
     }
 
+    let applicationLink = '';
+    let reblogLink = '';
+    let reblogIcon = 'retweet';
+    let favouriteLink = '';
+
+    if (status.get('application')) {
+      applicationLink = <React.Fragment><a className='detailed-status__application' href={status.getIn(['application', 'website'])} target='_blank' rel='noopener noreferrer'>{status.getIn(['application', 'name'])}</a></React.Fragment>;
+    }
+
+    if (['private', 'direct'].includes(status.get('visibility'))) {
+      reblogLink = '';
+    } else if (this.context.router) {
+      reblogLink = (
+        <React.Fragment>
+          <React.Fragment> · </React.Fragment>
+          <Link to={`/statuses/${status.get('id')}/reblogs`} className='detailed-status__link'>
+            <Icon id={reblogIcon} />
+            <span className='detailed-status__reblogs'>
+              <AnimatedNumber value={status.get('reblogs_count')} />
+            </span>
+          </Link>
+        </React.Fragment>
+      );
+    } else {
+      reblogLink = (
+        <React.Fragment>
+          <React.Fragment> · </React.Fragment>
+          <a href={`/interact/${status.get('id')}?type=reblog`} className='detailed-status__link' onClick={this.handleModalLink}>
+            <Icon id={reblogIcon} />
+            <span className='detailed-status__reblogs'>
+              <AnimatedNumber value={status.get('reblogs_count')} />
+            </span>
+          </a>
+        </React.Fragment>
+      );
+    }
+
+    if (this.context.router) {
+      favouriteLink = (
+        <Link to={`/statuses/${status.get('id')}/favourites`} className='detailed-status__link'>
+          <Icon id='star' />
+          <span className='detailed-status__favorites'>
+            <AnimatedNumber value={status.get('favourites_count')} />
+          </span>
+        </Link>
+      );
+    } else {
+      favouriteLink = (
+        <a href={`/interact/${status.get('id')}?type=favourite`} className='detailed-status__link' onClick={this.handleModalLink}>
+          <Icon id='star' />
+          <span className='detailed-status__favorites'>
+            <AnimatedNumber value={status.get('favourites_count')} />
+          </span>
+        </a>
+      );
+    }
+
     if (otherAccounts && otherAccounts.size > 0) {
       statusAvatar = <AvatarComposite accounts={otherAccounts} size={48} />;
     } else if (account === undefined || account === null) {
@@ -461,10 +520,10 @@ class Status extends ImmutablePureComponent {
 
     return (
       <HotKeys handlers={handlers}>
-        <div onClick={this.handleExpandClick} className={classNames('status__wrapper', `status__wrapper-${status.get('visibility')}`, { 'status__wrapper-reply': !!status.get('in_reply_to_id'), unread, focusable: !this.props.muted })} tabIndex={this.props.muted ? null : 0} data-featured={featured ? 'true' : null} aria-label={textForScreenReader(intl, status, rebloggedByText)} ref={this.handleRef}>
+        <div onClick={this.handleExpandClick} className={classNames('detailed-status__wrapper', `status__wrapper-${status.get('visibility')}`, { 'status__wrapper-reply': !!status.get('in_reply_to_id'), unread, focusable: !this.props.muted })} tabIndex={this.props.muted ? null : 0} data-featured={featured ? 'true' : null} aria-label={textForScreenReader(intl, status, rebloggedByText)} ref={this.handleRef}>
           {prepend}
 
-          <div className={classNames('status', 'card_layout', `status-${status.get('visibility')}`, { 'status-reply': !!status.get('in_reply_to_id'), muted: this.props.muted })} data-id={status.get('id')}>
+          <div className={classNames('status', `status-${status.get('visibility')}`, { 'status-reply': !!status.get('in_reply_to_id'), muted: this.props.muted })} data-id={status.get('id')}>
             <div className='status__info'>
               <a className='status__display-name'>
                 <a onClick={this.handleAccountClick} data-id={status.getIn(['account', 'id'])} href={status.getIn(['account', 'url'])} title={status.getIn(['account', 'acct'])} target='_blank' rel='noopener noreferrer'>
@@ -488,8 +547,11 @@ class Status extends ImmutablePureComponent {
 
             {media}
 
-            <StatusActionBar scrollKey={scrollKey} status={status} account={account} {...other} />
+            <div className='detailed-status__meta'>
+              {applicationLink}{reblogLink} · {favouriteLink}
+            </div>
           </div>
+          <StatusActionBar scrollKey={scrollKey} status={status} account={account} {...other} />
         </div>
       </HotKeys>
     );

@@ -1175,7 +1175,11 @@
   align-items: center;
   display: flex;
   justify-content: space-around;
-  margin-top: 8px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  margin-top:0 !important;
+  background: #ffffff;
+  border-top: 1px solid #c0cdd9;
 }
 
 .status__action-bar-button {

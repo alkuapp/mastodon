@@ -16,6 +16,8 @@ import classNames from 'classnames';
 import Icon from 'mastodon/components/icon';
 import AnimatedNumber from 'mastodon/components/animated_number';
 import PictureInPicturePlaceholder from 'mastodon/components/picture_in_picture_placeholder';
+import { domain } from '../../../initial_state';
+import RelativeTimestamp from '../../../components/relative_timestamp';
 
 const messages = defineMessages({
   public_short: { id: 'privacy.public.short', defaultMessage: 'Public' },
@@ -103,6 +105,7 @@ class DetailedStatus extends ImmutablePureComponent {
   }
 
   render () {
+    let statusAvatar;
     const status = (this.props.status && this.props.status.get('reblog')) ? this.props.status.get('reblog') : this.props.status;
     const outerStyle = { boxSizing: 'border-box' };
     const { intl, compact, pictureInPicture } = this.props;
@@ -176,7 +179,7 @@ class DetailedStatus extends ImmutablePureComponent {
     }
 
     if (status.get('application')) {
-      applicationLink = <React.Fragment> · <a className='detailed-status__application' href={status.getIn(['application', 'website'])} target='_blank' rel='noopener noreferrer'>{status.getIn(['application', 'name'])}</a></React.Fragment>;
+      applicationLink = <React.Fragment><a className='detailed-status__application' href={status.getIn(['application', 'website'])} target='_blank' rel='noopener noreferrer'>{status.getIn(['application', 'name'])}</a></React.Fragment>;
     }
 
     const visibilityIconInfo = {
@@ -187,7 +190,6 @@ class DetailedStatus extends ImmutablePureComponent {
     };
 
     const visibilityIcon = visibilityIconInfo[status.get('visibility')];
-    const visibilityLink = <React.Fragment> · <Icon id={visibilityIcon.icon} title={visibilityIcon.text} /></React.Fragment>;
 
     if (['private', 'direct'].includes(status.get('visibility'))) {
       reblogLink = '';
@@ -237,22 +239,36 @@ class DetailedStatus extends ImmutablePureComponent {
       );
     }
 
+    statusAvatar = <Avatar account={status.get('account')} size={48} />;
+
     return (
       <div style={outerStyle}>
         <div ref={this.setRef} className={classNames('detailed-status', `detailed-status-${status.get('visibility')}`, { compact })}>
-          <a href={status.getIn(['account', 'url'])} onClick={this.handleAccountClick} className='detailed-status__display-name'>
-            <div className='detailed-status__display-avatar'><Avatar account={status.get('account')} size={48} /></div>
-            <DisplayName account={status.get('account')} localDomain={this.props.domain} />
-          </a>
+          <div className='status__info'>
+            <a className='status__display-name'>
+              <a onClick={this.handleAccountClick} data-id={status.getIn(['account', 'id'])} href={status.getIn(['account', 'url'])} title={status.getIn(['account', 'acct'])} target='_blank' rel='noopener noreferrer'>
+                <div className='status__avatar'>
+                  {statusAvatar}
+                </div>
+              </a>
+
+              <div className={'status__display-name-title'}>
+                <a onClick={this.handleAccountClick} data-id={status.getIn(['account', 'id'])} href={status.getIn(['account', 'url'])} title={status.getIn(['account', 'acct'])} target='_blank' rel='noopener noreferrer' className='status__display-name__link'>
+                  <DisplayName account={status.get('account')} localDomain={this.props.domain !== domain ? this.props.domain : undefined} />
+                </a>
+                <a href={status.get('url')} className='status__relative-time' target='_blank' rel='noopener noreferrer'>
+                  <RelativeTimestamp timestamp={status.get('created_at')} /> &middot; <span className='status__visibility-icon'><Icon id={visibilityIcon.icon} title={visibilityIcon.text} /></span>
+                </a>
+              </div>
+            </a>
+          </div>
 
           <StatusContent status={status} expanded={!status.get('hidden')} onExpandedToggle={this.handleExpandedToggle} />
 
           {media}
 
           <div className='detailed-status__meta'>
-            <a className='detailed-status__datetime' href={status.get('url')} target='_blank' rel='noopener noreferrer'>
-              <FormattedDate value={new Date(status.get('created_at'))} hour12={false} year='numeric' month='short' day='2-digit' hour='2-digit' minute='2-digit' />
-            </a>{visibilityLink}{applicationLink}{reblogLink} · {favouriteLink}
+            {applicationLink}{reblogLink} · {favouriteLink}
           </div>
         </div>
       </div>
