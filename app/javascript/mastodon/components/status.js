@@ -444,7 +444,9 @@ class Status extends ImmutablePureComponent {
       );
     }
 
+
     let applicationLink = '';
+    let replyLink = '';
     let reblogLink = '';
     let reblogIcon = 'retweet';
     let favouriteLink = '';
@@ -452,6 +454,18 @@ class Status extends ImmutablePureComponent {
     if (status.get('application')) {
       applicationLink = <React.Fragment><a className='detailed-status__application' href={status.getIn(['application', 'website'])} target='_blank' rel='noopener noreferrer'>{status.getIn(['application', 'name'])}</a></React.Fragment>;
     }
+
+    replyLink = (
+      <React.Fragment>
+        <React.Fragment> · </React.Fragment>
+        <Link to={`/statuses/${status.get('id')}`} className='detailed-status__link'>
+          <Icon id='reply' />
+          <span className='detailed-status__reblogs'>
+            <AnimatedNumber value={status.get('replies_count')} />
+          </span>
+        </Link>
+      </React.Fragment>
+    );
 
     if (['private', 'direct'].includes(status.get('visibility'))) {
       reblogLink = '';
@@ -520,12 +534,12 @@ class Status extends ImmutablePureComponent {
 
     return (
       <HotKeys handlers={handlers}>
-        <div onClick={this.handleExpandClick} className={classNames('detailed-status__wrapper', `status__wrapper-${status.get('visibility')}`, { 'status__wrapper-reply': !!status.get('in_reply_to_id'), unread, focusable: !this.props.muted })} tabIndex={this.props.muted ? null : 0} data-featured={featured ? 'true' : null} aria-label={textForScreenReader(intl, status, rebloggedByText)} ref={this.handleRef}>
+        <div className={classNames('detailed-status__wrapper', `status__wrapper-${status.get('visibility')}`, { 'status__wrapper-reply': !!status.get('in_reply_to_id'), unread, focusable: !this.props.muted })} tabIndex={this.props.muted ? null : 0} data-featured={featured ? 'true' : null} aria-label={textForScreenReader(intl, status, rebloggedByText)} ref={this.handleRef}>
           {prepend}
 
           <div className={classNames('status', `status-${status.get('visibility')}`, { 'status-reply': !!status.get('in_reply_to_id'), muted: this.props.muted })} data-id={status.get('id')}>
             <div className='status__info'>
-              <a className='status__display-name'>
+              <div className='status__display-name'>
                 <a onClick={this.handleAccountClick} data-id={status.getIn(['account', 'id'])} href={status.getIn(['account', 'url'])} title={status.getIn(['account', 'acct'])} target='_blank' rel='noopener noreferrer'>
                   <div className='status__avatar'>
                     {statusAvatar}
@@ -536,11 +550,11 @@ class Status extends ImmutablePureComponent {
                   <a onClick={this.handleAccountClick} data-id={status.getIn(['account', 'id'])} href={status.getIn(['account', 'url'])} title={status.getIn(['account', 'acct'])} target='_blank' rel='noopener noreferrer' className='status__display-name__link'>
                     <DisplayName account={status.get('account')} others={otherAccounts} />
                   </a>
-                  <a href={status.get('url')} className='status__relative-time' target='_blank' rel='noopener noreferrer'>
+                  <Link to={`/statuses/${status.get('id')}`} className='status__relative-time' rel='noopener noreferrer'>
                     <RelativeTimestamp timestamp={status.get('created_at')} /> &middot; <span className='status__visibility-icon'><Icon id={visibilityIcon.icon} title={visibilityIcon.text} /></span>
-                  </a>
+                  </Link>
                 </div>
-              </a>
+              </div>
             </div>
 
             <StatusContent status={status} onClick={this.handleClick} expanded={!status.get('hidden')} showThread={showThread} onExpandedToggle={this.handleExpandedToggle} collapsable onCollapsedToggle={this.handleCollapsedToggle} />
@@ -548,7 +562,7 @@ class Status extends ImmutablePureComponent {
             {media}
 
             <div className='detailed-status__meta'>
-              {applicationLink}{reblogLink} · {favouriteLink}
+              {applicationLink}{replyLink}{reblogLink} · {favouriteLink}
             </div>
           </div>
           <StatusActionBar scrollKey={scrollKey} status={status} account={account} {...other} />

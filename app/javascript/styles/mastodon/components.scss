@@ -1174,20 +1174,20 @@
 .status__action-bar {
   align-items: center;
   display: flex;
-  justify-content: space-around;
+  //justify-content: space-around;
   padding-top: 8px;
   padding-bottom: 8px;
   margin-top:0 !important;
   background: #ffffff;
   border-top: 1px solid #c0cdd9;
 }
-
-.status__action-bar-button {
-  margin-right: 18px;
-
-  &.icon-button--with-counter {
-    margin-right: 14px;
-  }
+.status__action-bar-button, .status__action-bar-dropdown {
+  flex: 1 0 0;
+  margin-right: 16px;
+  margin-left: 16px;
+}
+.status__action-bar-dropdown button {
+  width: 100% !important;
 }
 
 .status__action-bar-dropdown {

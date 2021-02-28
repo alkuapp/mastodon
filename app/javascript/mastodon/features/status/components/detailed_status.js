@@ -115,6 +115,7 @@ class DetailedStatus extends ImmutablePureComponent {
     }
 
     let media           = '';
+    let replyLink = '';
     let applicationLink = '';
     let reblogLink = '';
     let reblogIcon = 'retweet';
@@ -190,6 +191,18 @@ class DetailedStatus extends ImmutablePureComponent {
     };
 
     const visibilityIcon = visibilityIconInfo[status.get('visibility')];
+
+    replyLink = (
+      <React.Fragment>
+        <React.Fragment> · </React.Fragment>
+        <Link to={`/statuses/${status.get('id')}`} className='detailed-status__link'>
+          <Icon id='reply' />
+          <span className='detailed-status__reblogs'>
+            <AnimatedNumber value={status.get('replies_count')} />
+          </span>
+        </Link>
+      </React.Fragment>
+    );
 
     if (['private', 'direct'].includes(status.get('visibility'))) {
       reblogLink = '';
@@ -268,7 +281,7 @@ class DetailedStatus extends ImmutablePureComponent {
           {media}
 
           <div className='detailed-status__meta'>
-            {applicationLink}{reblogLink} · {favouriteLink}
+            {applicationLink}{replyLink}{reblogLink} · {favouriteLink}
           </div>
         </div>
       </div>
