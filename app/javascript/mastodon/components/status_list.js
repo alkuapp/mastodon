@@ -7,6 +7,9 @@ import ImmutablePureComponent from 'react-immutable-pure-component';
 import LoadGap from './load_gap';
 import ScrollableList from './scrollable_list';
 import RegenerationIndicator from 'mastodon/components/regeneration_indicator';
+import { timelineInjectionRate, adInjectionRate } from '../initial_state';
+import RootTimelineInjection from './timeline_injections/root_timeline_injection';
+import { AD_INJECTION_COMPONENT } from '../initial_state';
 
 export default class StatusList extends ImmutablePureComponent {
 
@@ -84,26 +87,51 @@ export default class StatusList extends ImmutablePureComponent {
       return <RegenerationIndicator />;
     }
 
-    let scrollableContent = (isLoading || statusIds.size > 0) ? (
-      statusIds.map((statusId, index) => statusId === null ? (
-        <LoadGap
-          key={'gap:' + statusIds.get(index + 1)}
-          disabled={isLoading}
-          maxId={index > 0 ? statusIds.get(index - 1) : null}
-          onClick={onLoadMore}
-        />
-      ) : (
-        <StatusContainer
-          key={statusId}
-          id={statusId}
-          onMoveUp={this.handleMoveUp}
-          onMoveDown={this.handleMoveDown}
-          contextType={timelineId}
-          scrollKey={this.props.scrollKey}
-          showThread
-        />
-      ))
-    ) : null;
+    let scrollableContent = [];
+
+    if (isLoading || statusIds.size > 0) {
+      for (let index = 0; index < statusIds.size; index++) {
+
+        if (this.props.timelineId === 'home') {
+          if (adInjectionRate > 0 && index % adInjectionRate === 0 && index !== 0) {
+            scrollableContent.push(
+              <RootTimelineInjection type={AD_INJECTION_COMPONENT} key={'ad' + statusId}/>,
+            );
+          } else if (timelineInjectionRate > 0 && index % timelineInjectionRate === 0 && index !== 0) {
+            scrollableContent.push(
+              <div key={'inject' + statusId}>
+              </div>,
+            );
+          }
+        }
+
+        const statusId = statusIds.get(index);
+        if (statusId === null) {
+          scrollableContent.push(
+            <LoadGap
+              key={'gap:' + statusIds.get(index + 1)}
+              disabled={isLoading}
+              maxId={index > 0 ? statusIds.get(index - 1) : null}
+              onClick={onLoadMore}
+            />,
+          );
+        } else {
+          scrollableContent.push(
+            <StatusContainer
+              key={statusId}
+              id={statusId}
+              onMoveUp={this.handleMoveUp}
+              onMoveDown={this.handleMoveDown}
+              contextType={timelineId}
+              scrollKey={this.props.scrollKey}
+              showThread
+            />,
+          );
+        }
+      }
+    } else {
+      scrollableContent = null;
+    }
 
     if (scrollableContent && featuredStatusIds) {
       scrollableContent = featuredStatusIds.map(statusId => (

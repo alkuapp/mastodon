@@ -4,6 +4,11 @@ const initialState = element && JSON.parse(element.textContent);
 const getMeta = (prop) => initialState && initialState.meta && initialState.meta[prop];
 
 export const reduceMotion = getMeta('reduce_motion');
+export const timelineInjectionRate = getMeta('timeline_injection_rate');
+export const adInjectionRate = getMeta('ad_injection_rate');
+export const googleAdClient = getMeta('google_ad_client');
+export const googleAdSlot = getMeta('google_ad_slot');
+export const googleAdLayoutKey = getMeta('google_ad_layout_key');
 export const autoPlayGif = getMeta('auto_play_gif');
 export const displayMedia = getMeta('display_media');
 export const expandSpoilers = getMeta('expand_spoilers');
@@ -26,5 +31,7 @@ export const showTrends = getMeta('trends');
 export const title = getMeta('title');
 export const cropImages = getMeta('crop_images');
 export const disableSwiping = getMeta('disable_swiping');
+
+export const AD_INJECTION_COMPONENT = 'AD_INJECTION_COMPONENT';
 
 export default initialState;

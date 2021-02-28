@@ -618,6 +618,9 @@ en:
       site_description:
         desc_html: Introductory paragraph on the API. Describe what makes this Mastodon server special and anything else important. You can use HTML tags, in particular <code>&lt;a&gt;</code> and <code>&lt;em&gt;</code>.
         title: Server description
+      timeline_injection_rate:
+        desc_html: The rate at which to inject features, such as group recommendations, onto the home timeline.
+        title: Timeline injection rate
       site_description_extended:
         desc_html: A good place for your code of conduct, rules, guidelines and other things that set your server apart. You can use HTML tags
         title: Custom extended information
@@ -644,6 +647,20 @@ en:
       trends:
         desc_html: Publicly display previously reviewed hashtags that are currently trending
         title: Trending hashtags
+    timeline_injection:
+      title: Timeline injection
+      ad_injection_rate:
+        title: Ad injection rate
+        desc_html: The rate at which ads will be injected, set to 0 to show no ads and not load Google AdSense
+      google_ad_client:
+        title: Google ad client
+        desc_html: Your Google AdSense client ID
+      google_ad_slot:
+        title: Google ad slot
+        desc_html: The ad slot
+      google_ad_layout_key:
+        title: Google ad layout key
+        desc_html: The ad layout key
     site_uploads:
       delete: Delete uploaded file
       destroyed_msg: Site upload successfully deleted!

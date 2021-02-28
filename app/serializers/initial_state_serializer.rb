@@ -22,6 +22,11 @@ class InitialStateSerializer < ActiveModel::Serializer
       mascot: instance_presenter.mascot&.file&.url,
       profile_directory: Setting.profile_directory,
       trends: Setting.trends,
+      timeline_injection_rate: Setting.timeline_injection_rate&.to_i,
+      ad_injection_rate: Setting.ad_injection_rate&.to_i,
+      google_ad_client: Setting.google_ad_client,
+      google_ad_slot: Setting.google_ad_slot,
+      google_ad_layout_key: Setting.google_ad_layout_key,
     }
 
     if object.current_account
